@@ -92,6 +92,7 @@ write_stats_dos_lin :-
 
 write_stats_svn :-
     rev_modules(ModSet),
+    reverse(ModSet,MSreversed),
     stats_svn(File),
     open(File,write,Out,[]),
     call_cleanup(
@@ -99,7 +100,7 @@ write_stats_svn :-
             atomic_list_concat(ModSet,',',MStr),
             format(Out,'#startofyear,+/-files,~w~n',[MStr]),
             findall(r(Year,DF,CM),aggy(Year,DF,_,CM),Recs),
-            write_stats_(Out,ModSet,Recs,0)
+            write_stats_(Out,MSreversed,Recs,0)
         ),
         close(Out)
     ).
