@@ -1,7 +1,67 @@
 :-use_module(library(sgml)).
 :-use_module(library(xpath)).
 
+:- dynamic commit/4.
+
 stats_file('repo-statistics.xml').
+stats_dos('revo_dos.dat').
+stats_lin('revo_lin.dat').
+stats_dos_lin('revo_dos_lin.dat').
+
+load_commits :-
+    load_stats(DOM),
+    retractall(commit(_,_,_,_)),
+    forall(
+        commit(DOM,Date,Auth,DeltaFiles,DeltaLines),
+        assertz(commit(Date,Auth,DeltaFiles,DeltaLines))
+    ).
+
+write_stats_dos :-
+    stats_dos(File),
+    open(File,write,Out,[]),
+    call_cleanup(
+        (
+            lazy_findall(Time-Delta,commit(Time,_,Delta,_),Commits),
+            write_stats_(Out,Commits,0)
+        ),
+        close(Out)
+    ).
+
+write_stats_lin :-
+    stats_lin(File),
+    open(File,write,Out,[]),
+    call_cleanup(
+        (
+            lazy_findall(Time-Delta,commit(Time,_,_,Delta),Commits),
+            write_stats_(Out,Commits,0)
+        ),
+        close(Out)
+    ).
+
+write_stats_dos_lin :-
+    stats_dos_lin(File),
+    open(File,write,Out,[]),
+    call_cleanup(
+        (
+            lazy_findall(Time-DA-DB,commit(Time,_,DA,DB),Commits),
+            write_stats_(Out,Commits,0-0)
+        ),
+        close(Out)
+    ).
+
+write_stats_(_,[],_) :- false.
+
+write_stats_(Out,[Time-DA-DB|Rest],DA0-DB0) :-
+    !, time_epoch(Time,Epoch),
+    DA1 is DA0+DA, DB1 is DB0+DB,
+    format(Out,'~w,~w,~w~n',[Epoch,DA1,DB1]),
+    write_stats_(Out,Rest,DA1-DB1).
+
+write_stats_(Out,[Time-Delta|Rest],D0) :-
+    time_epoch(Time,Epoch),
+    D1 is D0+Delta,
+    format(Out,'~w,~w~n',[Epoch,D1]),
+    write_stats_(Out,Rest,D1).
 
 load_stats(DOM) :-
   stats_file(File),
@@ -43,7 +103,11 @@ file_stats(File,DF_0-DL_0,DF_1-DL_1) :-
         ;
         Act = deleted, DF_1 is DF_0 - 1
         ;
-        Act = changed, DF_1 = DF_0
-        ;
-        throw(unexpected_action(Act))
+        DF_1 = DF_0 % action=changed, 
+        % action="binary file or keyword subst...", aperas en unu loko, throw(unexpected_action(Act))
     )).
+
+time_epoch(TimeStr,Epoch) :-
+    atomic_list_concat(Parts,' ',TimeStr),
+    format(atom(T),'~wT~wZ',Parts),
+    parse_time(T,iso_8601,Epoch).
