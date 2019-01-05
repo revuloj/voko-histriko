@@ -1,6 +1,6 @@
 #!bin/bash
-
-$date = `date +"%Y-%m-%d"`
+#JAVA_HOME=/usr/lib/jvm/java-9-openjdk-amd64
+date = `date +"%Y-%m-%d"`
 cvs -d `pwd`/cvsroot checkout revo
 cvs log revo > ${date}-revocvs.log
 #ln -s ${date}-revocvs.log cvs.log

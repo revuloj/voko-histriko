@@ -1,5 +1,5 @@
 set datafile separator ","
-set terminal png size 900,400
+set terminal png size 1000,600
 set title "Revo - Artikoloj"
 set ylabel "Artikoloj / Linioj"
 set xlabel "Jaro"

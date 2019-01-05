@@ -1,4 +1,7 @@
 cvsroot
 revo
 repo-statistics.xml
+vokosvn-log.xml
+test.png
+*.log
 *.dat
