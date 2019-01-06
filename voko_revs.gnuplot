@@ -41,7 +41,7 @@ plot \
   "voko_svn.dat" using 1:($10+$11+$13+$14+$15+$16+$18+$19+$21+$22) title 'dsl' with filledcurves x1 fs pattern 6, \
   "voko_svn.dat" using 1:($11+$13+$14+$15+$16+$18+$19+$21+$22) title 'dtd' with filledcurves x1 fs pattern 5, \
   "voko_svn.dat" using 1:($13+$14+$15+$16+$18+$19+$21+$22) title 'jav' with filledcurves x1 fs pattern 5, \
-  "voko_svn.dat" using 1:($14+$15+$16+$18+$19+$21+$22) title 'jsc' with filledcurves x1 fs pattern 6, \
+  "voko_svn.dat" using 1:($14+$15+$16+$18+$19+$21+$22) title 'jsc' with filledcurves x1 fs pattern 7, \
   "voko_svn.dat" using 1:($15+$16+$18+$19+$21+$22) title 'owl' with filledcurves x1 fs pattern 2, \
   "voko_svn.dat" using 1:($16+$18+$19+$21+$22) title 'smb' with filledcurves x1 lc rgb "seagreen" , \
   "voko_svn.dat" using 1:($18+$19+$21+$22) title 'stl' with filledcurves x1 fs pattern 7, \

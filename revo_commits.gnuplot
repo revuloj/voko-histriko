@@ -1,7 +1,8 @@
 set datafile separator ","
 set terminal png size 1000,600 font "Helvetica, 12"
 set title "Revo - Artikoloj"
-set ylabel "Artikoloj / Linioj"
+set ylabel "Artikoloj"
+set y2label "Linioj"
 set xlabel "Jaro"
 set xdata time
 set timefmt "%s"
