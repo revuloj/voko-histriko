@@ -1,5 +1,7 @@
 set datafile separator ","
-set terminal png size 1600,500
+set terminal png size 1600,500 font "Helvetica, 12"
+#set terminal png font "/Library/Fonts/Arial.ttf"
+#set terminal pngcairo font "LibreSans, 14"
 set title "Voko-iloj-ŝanĝoj"
 set ylabel "Ŝanĝoj laŭ dosierujo kaj jarkvarono"
 set y2label "Nombro da dosieroj"
@@ -14,12 +16,13 @@ set grid
 set y2tics 0, 100
 set ytics nomirror
 
-set label " transiro de SGML+DSSSL\n al XML+XSLT" at 954460800,35 point pt 5 front font "Sans,10" #point ps 3 front
-set label " enkonduko de Ant\n kaj Javo" at 1135987200,65 point pt 5 front font "Sans,10" 
-set label " plibonigado de redaktilo\n kaj serĉo-DB" at 1222732800,45 point pt 5 front font "Sans,10" 
-set label " OWL/RDF: aldono de vortklasoj\n kun laŭkategoriaj indeksoj" at 1372550400,185 point pt 5 front font "Sans,10" 
-set label " vortanalizilo per\n Revo-radikaro\n kaj Prologo" at 1400086400,65 point pt 5 front font "Sans,10" 
-set label " nova redaktilo surbaze de\n Prologo + jQuery UI" at 1451520000,125 point pt 5 front font "Sans,10" 
+set label " transiro de SGML+DSSSL al XML+XSLT" at 954460800,5 point pt 5 front font "Helvetica-Bold,10" #point ps 3 front
+set label " aldono de prototipa\n vortanalizilo" at 985996800,35 point pt 5 front font "Helvetica-Bold,10"
+set label " enkonduko de Ant\n kaj Javo" at 1135987200,65 point pt 5 front font "Helvetica-Bold,10" 
+set label " plibonigado de redaktilo\n kaj serĉo-DB" at 1222732800,45 point pt 5 front font "Helvetica-Bold,10" 
+set label " OWL/RDF: aldono de vortklasoj\n kun laŭkategoriaj indeksoj" at 1372550400,185 point pt 5 front font "Helvetica-Bold,10" 
+set label " vortanalizilo per\n Revo-radikaro\n kaj Prologo (git)" at 1400086400,65 point pt 5 front font "Helvetica-Bold,10" 
+set label " nova redaktilo surbaze de\n Prologo + jQuery UI" at 1451520000,125 point pt 5 front font "Helvetica-Bold,10" 
 #https://newspaint.wordpress.com/2013/09/11/creating-a-filled-stack-graph-in-gnuplot/
 
 # ellasu:
