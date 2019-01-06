@@ -3,7 +3,7 @@
 :-use_module(library(sgml)).
 :-use_module(library(xpath)).
 
-:- dynamic commit/4, rev/5, revy/4, aggy/4.
+:- dynamic commit/4, rev/5, revy/4, aggy/4, revm/4, aggm/4, revq/4, aggq/4.
 
 cvs_stats_file('repo-statistics.xml').
 svn_log_file('vokosvn-log.xml').
@@ -12,7 +12,18 @@ stats_dos('revo_dos.dat').
 stats_lin('revo_lin.dat').
 stats_dos_lin('revo_dos_lin.dat').
 
-stats_svn('voko_svn.dat').
+stats_svn_jar('voko_svn_jar.dat').
+stats_svn_qua('voko_svn_qua.dat').
+stats_svn_mon('voko_svn_mon.dat').
+
+cvs :-
+    load_cvs_commits,
+    write_stats_dos_lin.
+
+svn :-
+    load_svn_revs,
+    write_stats_svn_years,
+    write_stats_svn_quarters.
 
 load_cvs_commits :-
     load_cvs_stats(DOM),
@@ -29,7 +40,9 @@ load_svn_revs :-
         revision(DOM,Date,Rev,DeltaFiles,ChangedFiles,ChangesByModule),
         asserta(rev(Date,Rev,DeltaFiles,ChangedFiles,ChangesByModule))
     ),
-    agg_revs_by_year.
+    agg_revs_by_year,
+    agg_revs_by_month,
+    agg_revs_by_quarter.
 
 agg_revs_by_year :-
     retractall(revy(_,_,_,_)),
@@ -43,11 +56,52 @@ agg_revs_by_year :-
     ),
     rev_years(Years),
     maplist(agg_rev_year,Years).
-    
+
+
 agg_rev_year(Year) :-
     findall(DF-CF-CM,revy(Year,DF,CF,CM),List),
     foldl(sum_rev,List,0-0-_{},DFyear-CFyear-CMyear),
     assertz(aggy(Year,DFyear,CFyear,CMyear)).
+
+agg_revs_by_quarter :-
+    retractall(revq(_,_,_,_)),
+    retractall(aggq(_,_,_,_)),
+    forall(
+        rev(Date,_,DF,CF,CM),
+        (
+            sub_atom(Date,0,4,_,Y),
+            sub_atom(Date,5,2,_,M),
+            atom_number(M,M_),
+            Q is M_ - ((M_-1) mod 3),
+            format(atom(Quarter),'~w-~|~`0t~d~2+',[Y,Q]),
+            assertz(revq(Quarter,DF,CF,CM))
+        )
+    ),
+    rev_quarters(Qs),
+    maplist(agg_rev_quarter,Qs).
+
+agg_rev_quarter(Qu) :-
+    findall(DF-CF-CM,revq(Qu,DF,CF,CM),List),
+    foldl(sum_rev,List,0-0-_{},DFq-CFq-CMq),
+    assertz(aggq(Qu,DFq,CFq,CMq)).
+
+agg_revs_by_month :-
+    retractall(revy(_,_,_,_)),
+    retractall(aggy(_,_,_,_)),
+    forall(
+        rev(Date,_,DF,CF,CM),
+        (
+            sub_atom(Date,0,7,_,Month),
+            assertz(revm(Month,DF,CF,CM))
+        )
+    ),
+    rev_months(Months),
+    maplist(agg_rev_month,Months).
+
+agg_rev_month(Month) :-
+    findall(DF-CF-CM,revm(Month,DF,CF,CM),List),
+    foldl(sum_rev,List,0-0-_{},DFmonth-CFmonth-CMmonth),
+    assertz(aggm(Month,DFmonth,CFmonth,CMmonth)).
 
 sum_rev(DF-CF-CM,DF0-CF0-CM0,DF1-CF1-CM1) :-
     DF1 is DF0 + DF,
@@ -90,16 +144,46 @@ write_stats_dos_lin :-
         close(Out)
     ).
 
-write_stats_svn :-
+write_stats_svn_years :-
     rev_modules(ModSet),
     reverse(ModSet,MSreversed),
-    stats_svn(File),
+    stats_svn_jar(File),
     open(File,write,Out,[]),
     call_cleanup(
         (
             atomic_list_concat(ModSet,',',MStr),
             format(Out,'#startofyear,+/-files,~w~n',[MStr]),
             findall(r(Year,DF,CM),aggy(Year,DF,_,CM),Recs),
+            write_stats_(Out,MSreversed,Recs,0)
+        ),
+        close(Out)
+    ).
+
+write_stats_svn_quarters :-
+    rev_modules(ModSet),
+    reverse(ModSet,MSreversed),
+    stats_svn_qua(File),
+    open(File,write,Out,[]),
+    call_cleanup(
+        (
+            atomic_list_concat(ModSet,',',MStr),
+            format(Out,'#startofquarter,+/-files,~w~n',[MStr]),
+            findall(r(Mon,DF,CM),aggq(Mon,DF,_,CM),Recs),
+            write_stats_(Out,MSreversed,Recs,0)
+        ),
+        close(Out)
+    ).
+
+write_stats_svn_months :-
+    rev_modules(ModSet),
+    reverse(ModSet,MSreversed),
+    stats_svn_mon(File),
+    open(File,write,Out,[]),
+    call_cleanup(
+        (
+            atomic_list_concat(ModSet,',',MStr),
+            format(Out,'#month,+/-files,~w~n',[MStr]),
+            findall(r(Mon,DF,CM),aggm(Mon,DF,_,CM),Recs),
             write_stats_(Out,MSreversed,Recs,0)
         ),
         close(Out)
@@ -198,6 +282,13 @@ rev_modules(Modules) :-
 rev_years(Years) :-
     setof(Year,A^B^C^revy(Year,A,B,C),Years).
 
+
+rev_quarters(Quarters) :-
+    setof(Qu,A^B^C^revq(Qu,A,B,C),Quarters).
+
+rev_months(Months) :-
+    setof(Month,A^B^C^revm(Month,A,B,C),Months).
+
 path_stats(Pathes,DeltaFiles,ChangedFiles,ChangesByModule) :-
     bagof(Act-File,xpath(Pathes,path(@action=Act,@kind=file,text),File),Files),
     foldl(svn_file_stats,Files,0-0-_{},DeltaFiles-ChangedFiles-ChangesByModule).
@@ -247,8 +338,12 @@ time_epoch(YearStr,Epoch) :-
     format(atom(T),'~w-01',[YearStr]),
     parse_time(T,iso_8601,Epoch).
 
+time_epoch(MonStr,Epoch) :-
+    atom_length(MonStr,7),!,
+    parse_time(MonStr,iso_8601,Epoch).
+
 time_epoch(TimeStr,Epoch) :-
-    atom_length(TimeStr,L), L>15, !,
+    atom_length(TimeStr,L), L>12, !,
     atomic_list_concat(Parts,' ',TimeStr),
     format(atom(T),'~wT~wZ',Parts),
     parse_time(T,iso_8601,Epoch).
