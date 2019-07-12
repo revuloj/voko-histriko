@@ -113,7 +113,7 @@ write_stats_dos :-
     open(File,write,Out,[]),
     call_cleanup(
         (
-            format(Out,'# time, +/-files~n'),
+            format(Out,'# time, +/-files~n',[]),
             lazy_findall(Time-Delta,commit(Time,_,Delta,_),Commits),
             write_stats_(Out,Commits,0)
         ),
@@ -125,7 +125,7 @@ write_stats_lin :-
     open(File,write,Out,[]),
     call_cleanup(
         (
-            format(Out,'# time, +/-lines~n'),
+            format(Out,'# time, +/-lines~n',[]),
             lazy_findall(Time-Delta,commit(Time,_,_,Delta),Commits),
             write_stats_(Out,Commits,0)
         ),
@@ -137,7 +137,7 @@ write_stats_dos_lin :-
     open(File,write,Out,[]),
     call_cleanup(
         (
-            format(Out,'# time, +/-files, +/-lines~n'),
+            format(Out,'# time, +/-files, +/-lines~n',[]),
             lazy_findall(Time-DA-DB,commit(Time,_,DA,DB),Commits),
             write_stats_(Out,Commits,0-0)
         ),
