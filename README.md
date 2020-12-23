@@ -3,7 +3,7 @@ Kreas historian statistikon (do kronikon) pri Reta Vortaro
 
 Historia statistiko estas kreata pri la nombro de artikoloj, ŝanĝoj kaj linioj ekde la fondado. La artikoloj estas arĥivataj per CVS, kiu ja tenas ĉiujn bezonatajn informojn. Do por krei la statistikojn vi bezonas kopion de CVSROOT/revo, kiu ne enestas en tiu kodejo. (Do petu provizore ĉe mi)
 
-[Evoluo de artikoloj kaj linioj de Revo](revo_commits.png)
+![Evoluo de artikoloj kaj linioj de Revo](revo_commits.png)
 
 Krome estas bezonata:
 - cvs
